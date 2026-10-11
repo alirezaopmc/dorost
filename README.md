@@ -76,6 +76,34 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
 
+## Forms, tables, and frames
+
+These helpers accept caller-owned content and inherit the surrounding document's
+language, direction, and fonts. They do not read data files or impose a schema.
+
+| Function | Inputs and behavior |
+| --- | --- |
+| `labeled-field(label, value, label-style: "strong", row-gutter: 0em)` | Label above value; style accepts `"strong"` or `"muted"`. Gutter separates the rows. |
+| `choice-group(items, selected: none, columns: 1)` | Array of content in a grid; columns is a positive integer. Optional selected index is zero-based and must identify an item. Markers are `(x)` and `( )`. Empty arrays are supported. |
+| `data-table(columns, rows, header: true, align: auto)` | Positive integer column count and an array of row arrays, each with exactly that many cells. Boolean header styles and repeats the first row. Empty row collections are supported. |
+| `border-frame(body, style: "single", title: none)` | Single or double border around content, with an optional caller-provided title. |
+| `section-title(title, rule: true)` | Bold visual title and optional rule; rule is boolean. Choose native heading levels separately. |
+
+Table alignment accepts native `auto` or the strings `"auto"`, `"start"`,
+`"center"`, and `"end"`. Start/end follow the surrounding text direction, as do
+column ordering and choice marker placement. Unsupported options and malformed table or
+choice inputs produce `dorost:` diagnostics.
+
+```typ
+#import "@preview/dorost:0.1.1": labeled-field, choice-group, data-table, border-frame, section-title
+
+#section-title[Your section]
+#labeled-field([Your label], [Your value])
+#choice-group(([First option], [Second option]), selected: 1, columns: 2)
+#data-table(2, (([Your heading], [Another heading]), ([Your cell], [Another cell])))
+#border-frame(style: "double", title: [Your title])[Your content]
+```
+
 ## Optional covers and page chrome
 
 `cover-page(title, subtitle: none, author: none, date: none, logo: none, details: none)`

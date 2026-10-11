@@ -13,3 +13,6 @@
 #import "src/components/resources.typ": resource-link, resource-links
 #import "src/layout/cover.typ": cover-page
 #import "src/layout/page-chrome.typ": page-chrome
+#import "src/components/forms.typ": labeled-field, choice-group
+#import "src/components/tables.typ": data-table
+#import "src/components/frames.typ": border-frame, section-title

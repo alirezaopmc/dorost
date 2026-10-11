@@ -76,7 +76,7 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts data-components; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
@@ -125,6 +125,29 @@ for label in 'API.get(2)' 'Accent badge' 'Neutral badge' 'Muted badge' \
   'Grouped detail' 'فارسی'; do
   require_text "$work/components.txt" "$label"
 done
+
+# Caller-owned data and selection markers must survive rendering in both directions.
+pdftotext -layout "$work/data-components.pdf" "$work/data-components.txt"
+# Raw order keeps LTR marker punctuation together inside RTL choice rows.
+pdftotext -raw "$work/data-components.pdf" "$work/data-components-raw.txt"
+for label in 'English data components' 'Caller label' 'Caller value' 'Muted value' \
+  'First choice' 'Selected choice' 'Last choice' 'Unselected choice' '(x)' '( )' \
+  'Header one' 'Header two' 'Cell one' 'Cell two' 'Plain one' 'Plain two' \
+  'Start aligned' 'End aligned' 'Auto aligned' 'Single title' 'Double title' \
+  'Single frame body' 'Double frame body' 'No rule title' 'Untitled frame' 'فارسی'; do
+  require_text "$work/data-components.txt" "$label"
+done
+python3 - "$work/data-components-raw.txt" <<'PY_DATA'
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+assert len([p for p in pages if p.strip()]) == 2, "expected two A4 data fixture pages"
+assert "(x) Selected choice" in pages[0], "selected index must mark the second English choice"
+assert pages[0].count("(x)") == 1, "expected exactly one selected English choice"
+assert pages[0].count("( )") == 3, "expected three unselected English choices"
+assert pages[1].count("(x)") == 1, "expected exactly one selected Persian choice"
+assert pages[1].count("( )") == 1, "expected one unselected Persian choice"
+PY_DATA
 
 pdftotext "$work/document-config.pdf" "$work/document-config.txt"
 require_text "$work/document-config.txt" 'English LTR defaults remain explicit.'
@@ -209,6 +232,17 @@ for option in numbering rule; do
     exit 1
   fi
   require_text "$work/invalid.log" "dorost: $option must be a boolean"
+done
+
+for option in columns-zero columns-fraction columns-type rows-type row-type row-width \
+  align header frame-style choice-columns-zero choice-columns-fraction choice-items \
+  choice-content selected-negative selected-outside selected-type selected-empty label-style section-rule; do
+  if typst compile tests/fixtures/invalid-data-table.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid data component $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost:'
 done
 
 # Keep the registry preview within Typst's documented image size limit.
