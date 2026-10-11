@@ -8,3 +8,6 @@
 #let default-colors = default-colors
 #import "src/text/direction.typ": ltr, rtl
 #import "src/text/digits.typ": persian-digits
+#import "src/components/inline.typ": code-inline, math-inline, badge
+#import "src/components/blocks.typ": note, quote-frame, prompt-example, checklist
+#import "src/components/resources.typ": resource-link, resource-links

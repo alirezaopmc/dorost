@@ -76,13 +76,26 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
   name=$(basename "$example" .typ)
   typst compile "$example" "$work/example-$name.pdf" "${compile_args[@]}"
   pdftotext -layout "$work/example-$name.pdf" "$work/example-$name.txt"
+done
+
+pdftotext "$work/components.pdf" "$work/components.txt"
+typst compile tests/fixtures/components.typ "$work/inline-font.pdf" --pages 1 --no-pdf-tags "${compile_args[@]}"
+pdffonts "$work/inline-font.pdf" > "$work/inline-font.txt"
+require_text "$work/inline-font.txt" 'JetBrainsMono'
+for label in 'API.get(2)' 'Accent badge' 'Neutral badge' 'Muted badge' \
+  'Default note body' 'Note title' 'Titled note body' 'Muted note body' \
+  'Default quotation' 'Quoted author' 'Attributed quotation' 'Prompt label' \
+  'Prompt body' 'First checklist item' 'Second checklist item' 'Single resource' \
+  'Detailed resource' 'Resource detail' 'Grouped resource one' 'Grouped resource two' \
+  'Grouped detail' 'فارسی'; do
+  require_text "$work/components.txt" "$label"
 done
 
 pdftotext "$work/document-config.pdf" "$work/document-config.txt"
@@ -151,6 +164,14 @@ for fixture in tests/fixtures/invalid-*.typ; do
     exit 1
   fi
   grep -Fq 'dorost:' "$work/invalid.log"
+done
+for component in badge note; do
+  if typst compile tests/fixtures/invalid-component-options.typ "$work/invalid.pdf" \
+    --input "component=$component" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid $component tone failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost: tone must be'
 done
 
 # Keep the registry preview within Typst's documented image size limit.
