@@ -76,7 +76,7 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts data-components; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts data-components slides; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
@@ -84,6 +84,39 @@ for example in examples/*.typ; do
   typst compile "$example" "$work/example-$name.pdf" "${compile_args[@]}"
   pdftotext -layout "$work/example-$name.pdf" "$work/example-$name.txt"
 done
+
+# Every slide layout, both ratios, and page/document isolation.
+pdftotext "$work/slides.pdf" "$work/slides.txt"
+python3 - "$work/slides.txt" <<'PY_SLIDES'
+import re
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+if not pages[-1].strip():
+    pages.pop()
+assert len(pages) == 16, f"expected 16 slide/document pages, got {len(pages)}"
+for i, label in enumerate(("Slide cover", "Slide section", "Slide content", "Slide columns", None, "Slide image text", "Caller statement")):
+    if label:
+        assert label in pages[i], f"missing slide layout: {label}"
+    assert "Caller slide footer" in pages[i], f"missing slide footer: {i}"
+    assert re.search(rf"(?m)^\s*{i + 1}\s*$", pages[i]), f"missing slide counter: {i}"
+for label in ("Caller subtitle", "Ada Example", "2026-10-11"):
+    assert label in pages[0]
+for label in ("Start column", "End column"):
+    assert label in pages[3]
+assert "Image text body" in pages[5]
+assert "Caller attribution" in pages[6]
+assert "Ordinary document after slides." in pages[7]
+assert "Persian document after slides." in pages[15]
+for i in range(7, 16):
+    assert "Caller slide footer" not in pages[i], "slide footer leaked"
+    assert not re.search(rf"(?m)^\s*{i + 1}\s*$", pages[i]), "slide counter leaked or false ignored"
+assert "فارسی" in "".join(pages[8:])
+assert "Untitled content" in pages[10]
+assert "Unattributed statement" in pages[14]
+for label in ("Ada Example", "2026-10-11", "Caller subtitle", "Caller attribution"):
+    assert label not in "".join(pages[8:]), f"omitted slot emitted: {label}"
+PY_SLIDES
 
 # Cover slots, repeated chrome, numbering, and local page settings.
 pdftotext "$work/document-layouts.pdf" "$work/document-layouts.txt"
@@ -240,6 +273,15 @@ for option in columns-zero columns-fraction columns-type rows-type row-type row-
   if typst compile tests/fixtures/invalid-data-table.typ "$work/invalid.pdf" \
     --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
     echo "expected invalid data component $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost:'
+done
+
+for option in ratio counter fit text-fit side; do
+  if typst compile tests/fixtures/invalid-slide-options.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid slide $option failure" >&2
     exit 1
   fi
   require_text "$work/invalid.log" 'dorost:'

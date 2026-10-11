@@ -131,6 +131,52 @@ around page content rather than inside a block, grid, or other container.
 ]
 ```
 
+## Slides
+
+`slides(body, ratio: "16:9", show-counter: true, footer: none)` applies local
+native page settings: 320 × 180 mm for `"16:9"`, 320 × 240 mm for `"4:3"`,
+14 mm margins, and 20 pt text. It inherits the surrounding language, direction,
+fonts, and text color. Shared default paragraph spacing and leading apply inside
+slides. After the wrapper, the surrounding document settings resume.
+`show-counter` is boolean; counters use the native continuous page number with
+Arabic decimal digits. The optional caller-owned footer and counter align to
+start/end in the current direction. Slide pages suppress an enclosing header
+and native numbering; the wrapper's footer contains the optional counter.
+
+Each layout starts a new slide and fills its available page body. An initial
+weak page break avoids a blank first slide. Place layouts directly inside
+`slides`, and place the wrapper at page level, as with `page-chrome`.
+Authors keep content within the available slide area; oversized content follows
+native Typst layout behavior rather than being automatically scaled.
+
+| Function | Inputs and behavior |
+| --- | --- |
+| `slide-cover(title, subtitle: none, author: none, date: none)` | Vertically centered cover with caller-owned optional metadata; omitted slots disappear. |
+| `slide-section(title, subtitle: none)` | Vertically centered section title and optional subtitle. |
+| `slide-content(body, title: none)` | Body with an optional accent title and rule. |
+| `slide-columns(left, right, title: none, ratio: (1fr, 1fr))` | Two content columns in start/end order with native Typst column sizes. |
+| `slide-image(path, fit: "contain", background: none)` | Image fills the page body within margins; optional background behind the image. |
+| `slide-image-text(path, body, title: none, fit: "contain", image-side: "end")` | Equal image/text columns; image side accepts `"start"` or `"end"` relative to text direction. |
+| `slide-statement(body, attribution: none)` | Vertically centered framed statement with optional attribution. |
+
+Both image helpers accept native `"contain"` or `"cover"` fitting. Supply a
+Typst `path("...")` value constructed in your project so external assets resolve
+relative to your file across the package boundary. No image assets are bundled
+or fetched by these helpers. Invalid ratios, image fitting, image sides, and
+counter flags produce `dorost:` diagnostics.
+
+```typ
+#import "@preview/dorost:0.1.1": document, slides, slide-cover, slide-content, slide-image-text
+#show: document.with(lang: "en", direction: "ltr")
+
+#slides(footer: [Your footer])[
+  #slide-cover([Your title], author: [Your name])
+  #slide-content(title: [Your section])[Your content]
+  #slide-image-text(path("your-image.png"), [Your description], title: [Your image])
+]
+An ordinary document page follows with the surrounding page settings.
+```
+
 ## Development and verification
 
 Requires Typst 0.15.0 or later, `pdftotext`, Python 3.11+, and internet access on the first test run to fetch checksum-pinned upstream test fonts. CI checks the minimum supported Typst version (0.15.0) and current stable version (0.15.1).
