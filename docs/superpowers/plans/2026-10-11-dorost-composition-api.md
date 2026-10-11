@@ -56,25 +56,21 @@
 
 ## Tasks
 
-### Task 1: Lock compatibility and shared token/config contracts
+### Task 1: Lock existing compatibility and shared token contracts
 
 **Files:**
-- Modify: `src/config.typ`
-- Modify: `src/document.typ`
-- Modify: `lib.typ`
 - Create: `tests/fixtures/document-compatibility.typ`
 - Modify: `scripts/check.sh`
 
 **Interfaces:**
 - Consumes: current `document(body, lang:, direction:, fonts:, page:, text:, colors:)` and exported defaults.
-- Produces: unchanged current API plus only shared token exports that later public components need. Keep component-specific options within their owning functions.
+- Produces: a regression fixture for the existing API. The current `default-fonts`, `default-page`, `default-text`, and `default-colors` exports are the shared token contract; do not add aliases or new token layers. Later components can import the existing defaults internally and own their options locally.
 
 - [ ] **Step 1: Add a compatibility fixture** that compiles the current default `document()` call, a partial font/color override, and a raw code block inside Persian RTL text. Assert that extracted PDF text contains both Persian and `API.get(2)`.
 - [ ] **Step 2: Run the fixture through `./scripts/check.sh`** and confirm it passes before changing the configuration modules.
-- [ ] **Step 3: Add only shared tokens required by component/layout modules** to `src/config.typ`; preserve current defaults, merge validation, and direction semantics. Do not add course/proposal-specific defaults.
-- [ ] **Step 4: Re-export the agreed shared tokens explicitly from `lib.typ`** and document them as values rather than additional configuration layers.
-- [ ] **Step 5: Run `./scripts/check.sh`** and confirm the compatibility fixture and all existing fixtures pass.
-- [ ] **Step 6: Commit** as `feat: define shared composition tokens`.
+- [ ] **Step 3: Keep the current config and `lib.typ` exports unchanged** unless the compatibility fixture exposes a regression; do not introduce duplicate token aliases or course/proposal-specific defaults.
+- [ ] **Step 4: Run `./scripts/check.sh`** and confirm the compatibility fixture and all existing fixtures pass.
+- [ ] **Step 5: Commit** as `test: lock existing Dorost API compatibility`.
 
 ### Task 2: Add neutral inline and reusable content components
 
