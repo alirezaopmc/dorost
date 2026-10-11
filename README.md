@@ -71,13 +71,18 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 `ltr[content]` and `rtl[content]` apply only local text direction. Use them around Latin identifiers, URLs, or RTL phrases when needed. They do not select language or font. Raw code is automatically LTR and uses the code font role.
 
-`persian-digits(value)` explicitly maps ASCII digits `0`–`9` to Persian digits in strings and integers. It preserves punctuation and other string characters. It does not inspect or modify arbitrary Typst content, code, URLs, or math.
+`persian-digits(value)` explicitly maps ASCII digits `0`–`9` to Persian digits in strings and integers. For Typst numbering, use its native Persian counting symbol (`"۱"`, or `"۱.۱"` for nested levels) in the relevant numbering parameter. Page numbering remains unchanged unless configured. The helper does not inspect or modify arbitrary Typst content, code, URLs, or math.
 
 ```typ
 #import "@preview/dorost:0.2.0": document, ltr, persian-digits
 #show: document.with(lang: "fa", direction: "rtl")
+#set footnote(numbering: "۱")
 
 شناسه #ltr[API.get(2)] و تاریخ #ltr[#persian-digits("2026-10-11")]
+
+شماره‌گذاری چندسطحی بومی Typst: #ltr[#numbering("۱.۱", 1, 2, 3)].
+
+این جمله یک پانوشت دارد#footnote[نمونهٔ پانوشت فارسی.]
 ```
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
