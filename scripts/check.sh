@@ -241,6 +241,19 @@ require_text "$work/mixed-direction.txt" 'ک'
 require_text "$work/mixed-direction.txt" '‌'
 require_text "$work/persian-digits.txt" '۲۰۲۶-۱۰-۱۱'
 require_text "$work/persian-digits.txt" '2026-10-11'
+require_text "$work/persian-digits.txt" '۱.۲.۳'
+require_text "$work/persian-digits.txt" 'متن پانوشت فارسی'
+require_text "$work/persian-digits.txt" 'پانوشت دوم فارسی'
+python3 - "$work/persian-digits.txt" <<'PY_FOOTNOTES'
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text()
+text = text.translate({ord(char): None for char in "\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069"})
+assert re.search(r"\n\s*۱\s*متن پانوشت فارسی", text), "first footnote must use Persian marker ۱"
+assert re.search(r"\n\s*۲\s*پانوشت دوم فارسی", text), "second footnote must use Persian marker ۲"
+PY_FOOTNOTES
 require_text "$work/example-persian.txt" 'سند فارسی'
 require_text "$work/example-english.txt" 'English document'
 require_text "$work/example-mixed-direction.txt" 'شناسه'

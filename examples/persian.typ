@@ -1,6 +1,7 @@
 #import "@preview/dorost:0.2.0": document, ltr, persian-digits
 
 #show: document.with(lang: "fa", direction: "rtl")
+#set footnote(numbering: "۱")
 
 #set page(
   header: context [درست #h(1fr) #counter(page).display("1")],
@@ -12,6 +13,10 @@
 این نمونه فقط قابلیت‌های پایهٔ نوشتار فارسی را نمایش می‌دهد: ی فارسی، ک فارسی و نیم‌فاصله در واژهٔ می‌روم.
 
 تبدیل رقم‌ها اختیاری است: #ltr[#persian-digits("2026-10-11")].
+
+شماره‌گذاری چندسطحی بومی Typst: #ltr[#numbering("۱.۱", 1, 2, 3)].
+
+این جمله یک پانوشت دارد#footnote[نمونهٔ پانوشت فارسی.].
 
 == ساختار در اختیار نویسنده است
 
