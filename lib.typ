@@ -1,2 +1,8 @@
-// Public entry point. Keep exports explicit so internal modules remain private.
-#let document(body) = body
+#import "src/config.typ": default-fonts, default-page, default-text, default-colors
+#import "src/document.typ": document
+
+#let document = document
+#let default-fonts = default-fonts
+#let default-page = default-page
+#let default-text = default-text
+#let default-colors = default-colors
