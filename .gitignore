@@ -1,0 +1,5 @@
+*.pdf
+*.png.tmp
+*.log
+.typst-cache/
+build/

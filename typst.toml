@@ -1,0 +1,15 @@
+[package]
+name = "dorost"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Alireza Jafartash <@alirezapomc>"]
+license = "MIT AND MIT-0 AND OFL-1.1"
+description = "Compose English, Persian, and mixed-script documents."
+compiler = "0.15.1"
+categories = ["languages", "layout"]
+exclude = ["/tests/", "/scripts/", "/.github/"]
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
