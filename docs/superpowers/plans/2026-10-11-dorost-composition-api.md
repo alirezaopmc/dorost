@@ -110,6 +110,7 @@
 - Consumes: shared tokens from Task 1 and content helpers from Task 2.
 - Produces: `cover-page(title, subtitle: none, author: none, date: none, logo: none, details: none)` as an opt-in cover block; `page-chrome(body, header: none, footer: none, numbering: true, rule: true)` as an opt-in page-layout wrapper.
 - Caller owns the content, labels, logo, and identity. Omitted slots create no placeholder labels.
+- `numbering` and `rule` accept booleans only; `numbering: true` shows the native page number and `false` suppresses it. `cover-page` composes content for one page but does not insert page breaks; the caller controls page boundaries explicitly.
 
 - [ ] **Step 1: Add a document-layout fixture** with an English cover, a Persian cover omitting author/date/logo, a two-page body with page chrome, and mixed-direction header/footer text. Check extracted text for supplied content and absence of placeholder labels.
 - [ ] **Step 2: Add an invalid page-chrome fixture** with an unsupported numbering value and require a `dorost:` diagnostic.
