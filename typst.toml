@@ -1,6 +1,6 @@
 [package]
 name = "dorost"
-version = "0.1.1"
+version = "0.2.0"
 entrypoint = "lib.typ"
 authors = ["Alireza Jafartash <@alirezaopmc>"]
 license = "MIT AND MIT-0"
@@ -11,6 +11,8 @@ compiler = "0.15.0"
 categories = ["languages", "layout"]
 exclude = [
   "/tests/",
+  "/assets/",
+  "/docs/",
   "/scripts/",
   "/.github/",
   "/.superpowers/",

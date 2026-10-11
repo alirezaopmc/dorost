@@ -1,4 +1,4 @@
-#import "@local/dorost:0.1.1": document, cover-page, page-chrome, ltr, rtl, badge, note
+#import "@local/dorost:0.2.0": document, cover-page, page-chrome, ltr, rtl, badge, note
 #show: document.with()
 
 #cover-page(

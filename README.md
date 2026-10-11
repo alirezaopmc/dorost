@@ -15,13 +15,13 @@ Explore the [editable showcase](examples/showcase.typ), or download the [documen
 After publication, create an editable starter with:
 
 ```sh
-typst init @preview/dorost:0.1.1
+typst init @preview/dorost:0.2.0
 ```
 
 Or use the package in an existing `.typ` file:
 
 ```typ
-#import "@preview/dorost:0.1.1": document
+#import "@preview/dorost:0.2.0": document
 #show: document.with(lang: "en", direction: "ltr")
 
 = Your title
@@ -74,7 +74,7 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 `persian-digits(value)` explicitly maps ASCII digits `0`–`9` to Persian digits in strings and integers. It preserves punctuation and other string characters. It does not inspect or modify arbitrary Typst content, code, URLs, or math.
 
 ```typ
-#import "@preview/dorost:0.1.1": document, ltr, persian-digits
+#import "@preview/dorost:0.2.0": document, ltr, persian-digits
 #show: document.with(lang: "fa", direction: "rtl")
 
 شناسه #ltr[API.get(2)] و تاریخ #ltr[#persian-digits("2026-10-11")]
@@ -101,7 +101,7 @@ column ordering and choice marker placement. Unsupported options and malformed t
 choice inputs produce `dorost:` diagnostics.
 
 ```typ
-#import "@preview/dorost:0.1.1": labeled-field, choice-group, data-table, border-frame, section-title
+#import "@preview/dorost:0.2.0": labeled-field, choice-group, data-table, border-frame, section-title
 
 #section-title[Your section]
 #labeled-field([Your label], [Your value])
@@ -126,7 +126,7 @@ page settings create page boundaries when entering/leaving the wrapper; use it
 around page content rather than inside a block, grid, or other container.
 
 ```typ
-#import "@preview/dorost:0.1.1": document, cover-page, page-chrome
+#import "@preview/dorost:0.2.0": document, cover-page, page-chrome
 #show: document.with(lang: "en", direction: "ltr")
 
 #cover-page([Your title], subtitle: [Your subtitle], author: [Your name])
@@ -172,7 +172,7 @@ or fetched by these helpers. Invalid ratios, image fitting, image sides, and
 counter flags produce `dorost:` diagnostics.
 
 ```typ
-#import "@preview/dorost:0.1.1": document, slides, slide-cover, slide-content, slide-image-text
+#import "@preview/dorost:0.2.0": document, slides, slide-cover, slide-content, slide-image-text
 #show: document.with(lang: "en", direction: "ltr")
 
 #slides(footer: [Your footer])[

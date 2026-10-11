@@ -1,4 +1,4 @@
-#import "@local/dorost:0.1.1": slides, slide-image, slide-image-text
+#import "@local/dorost:0.2.0": slides, slide-image, slide-image-text
 #let option = sys.inputs.at("option", default: "ratio")
 #if option == "ratio" { slides(ratio: "1:1")[Invalid] }
 #if option == "counter" { slides(show-counter: "yes")[Invalid] }
