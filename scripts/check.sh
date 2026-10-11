@@ -197,6 +197,7 @@ for label in 'English data components' 'Caller label' 'Caller value' 'Muted valu
   require_text "$work/data-components.txt" "$label"
 done
 python3 - "$work/data-components-raw.txt" <<'PY_DATA'
+import re
 import sys
 from pathlib import Path
 pages = Path(sys.argv[1]).read_text().split("\f")
@@ -208,12 +209,8 @@ assert pages[0].count("( )") == 3, "expected three unselected English choices"
 assert pages[1].count("(x)") == 1, "expected exactly one selected Persian choice"
 assert pages[1].count("( )") == 1, "expected one unselected Persian choice"
 assert "فارسی نام" in pages[1] and "فارسی مقدار" in pages[1], "Persian field content must survive"
-persian_selection_lines = [
-    line for line in pages[1].splitlines() if "(x)" in line and "فارسی" in line
-]
-if not persian_selection_lines:
-    print("Persian page after bidi normalization:", repr(pages[1]))
-assert persian_selection_lines, "selected Persian marker must share a line with the first option"
+assert re.search(r"\(x\)\s+فارسی گزینه", pages[1]), \
+    "selected Persian marker must precede the first option"
 assert "فارسی عنوان" in pages[1] and "فارسی متن" in pages[1], "Persian table content must survive"
 assert "فارسی قاب" in pages[1], "Persian frame content must survive"
 PY_DATA
