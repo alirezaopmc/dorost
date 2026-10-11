@@ -76,7 +76,7 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config mixed-direction persian-digits colors; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
@@ -88,6 +88,10 @@ done
 pdftotext "$work/document-config.pdf" "$work/document-config.txt"
 require_text "$work/document-config.txt" 'English LTR defaults remain explicit.'
 require_text "$work/document-config.txt" 'API.get(2)'
+pdftotext "$work/document-compatibility.pdf" "$work/document-compatibility.txt"
+require_text "$work/document-compatibility.txt" 'Default document remains available.'
+require_text "$work/document-compatibility.txt" 'API.get(2'
+require_text "$work/document-compatibility.txt" 'فارسی'
 typst compile -f svg tests/fixtures/colors.typ "$work/colors.svg" "${compile_args[@]}"
 tr '[:upper:]' '[:lower:]' < "$work/colors.svg" > "$work/colors-lower.svg"
 for color in 102030 405060 708090 a0b0c0; do
