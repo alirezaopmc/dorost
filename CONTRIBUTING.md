@@ -19,6 +19,7 @@ Contributors add user-facing changes under `[Unreleased]` in `CHANGELOG.md`. For
 2. Moves the release notes into a dated `CHANGELOG.md` section named `## [X.Y.Z] - YYYY-MM-DD`.
 3. Runs `./scripts/check.sh`, `git diff --check`, and `python3 scripts/release-notes.py vX.Y.Z`.
 4. Creates and pushes an annotated `vX.Y.Z` tag from the verified commit. GitHub Actions checks the tag against the manifest and changelog, then creates the GitHub Release.
+   The release workflow also attaches rendered PDFs for the examples, including the bilingual showcase.
 5. Submits that exact package version to Typst Universe in a separate reviewed PR. GitHub releases do not publish to the Typst package registry.
 
 Published package versions are immutable; make a new SemVer version for every registry update. Do not publish an unreviewed API, font, or license change.

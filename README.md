@@ -23,6 +23,12 @@ Or use the package in an existing `.typ` file:
 Write with native Typst headings, paragraphs, lists, tables, links, code, and math.
 ```
 
+## Preview
+
+The showcase combines English, Persian, and mixed-direction text with Dorost's font roles, custom page and typography settings, native Typst structures, code, math, links, and optional Persian digits. Download the rendered PDF from the [latest GitHub release](https://github.com/alirezaopmc/dorost/releases/latest).
+
+[![Dorost bilingual showcase preview](assets/showcase.png)](https://github.com/alirezaopmc/dorost/releases/latest)
+
 The package is not tied to a university, course, proposal, thesis, report, or other document type. Consumers compose their own content and identity around the small core API.
 
 ### Fonts
@@ -74,7 +80,7 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 شناسه #ltr[API.get(2)] و تاریخ #ltr[#persian-digits("2026-10-11")]
 ```
 
-See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
+See [`examples/`](examples/) for the showcase and focused English, Persian, mixed-direction, and custom-theme sources.
 
 ## Development and verification
 
