@@ -1,3 +1,6 @@
+#let left-to-right = ltr
+#let right-to-left = rtl
+
 #let default-fonts = (
   body: ("Lora", "Vazirmatn"),
   code: "JetBrains Mono",
@@ -38,9 +41,10 @@
   if type(lang) != str or lang.trim().len() == 0 {
     panic("dorost: lang must be a non-empty string")
   }
-  if direction != ltr and direction != rtl {
-    panic("dorost: direction must be ltr or rtl")
+  if direction != "ltr" and direction != "rtl" {
+    panic("dorost: direction must be \"ltr\" or \"rtl\"")
   }
+  let direction = if direction == "ltr" { left-to-right } else { right-to-left }
   let fonts = merge-options("fonts", default-fonts, fonts)
   let page = merge-options("page", default-page, page)
   let text = merge-options("text", default-text, text)

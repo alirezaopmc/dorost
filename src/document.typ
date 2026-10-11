@@ -8,7 +8,7 @@
 #let document(
   body,
   lang: "en",
-  direction: ltr,
+  direction: "ltr",
   fonts: (:),
   page: (:),
   text: (:),

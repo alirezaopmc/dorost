@@ -20,14 +20,14 @@ The package entry point is `lib.typ`; import its documented names explicitly:
 
 ```typ
 #import "@preview/dorost:0.1.0": document
-#show: document.with(lang: "en", direction: ltr)
+#show: document.with(lang: "en", direction: "ltr")
 
 = Your title
 
 Write with native Typst headings, paragraphs, lists, tables, links, code, and math.
 ```
 
-`document` accepts independent `lang` (`"en"` by default), `direction` (`ltr` by default), `fonts`, `page`, `text`, and `colors` dictionaries. Language must be a non-empty language tag; direction is `ltr` or `rtl`. Partial dictionaries override only the supplied fields; unknown keys fail with a Dorost error.
+`document` accepts independent `lang` (`"en"` by default), `direction` (`"ltr"` by default), `fonts`, `page`, `text`, and `colors` dictionaries. Language must be a non-empty language tag; direction is the string `"ltr"` or `"rtl"`. Partial dictionaries override only the supplied fields; unknown keys fail with a Dorost error.
 
 | Export | Defaults |
 | --- | --- |
@@ -37,3 +37,16 @@ Write with native Typst headings, paragraphs, lists, tables, links, code, and ma
 | `default-colors` | `text`, `muted`, `accent`, `rule` neutral color tokens |
 
 The document wrapper sets page geometry, text language/direction/font/size/color, paragraph leading/spacing, list indentation/spacing, and LTR code styling. It does not add titles, headers, metadata, or sections. Override font roles through `fonts`; omitted roles retain their defaults.
+
+## Mixed direction and Persian digits
+
+`ltr[content]` and `rtl[content]` apply only a local text direction. Use them around Latin identifiers, URLs, or RTL phrases when the surrounding paragraph direction would otherwise affect ordering; they do not select a language or font. Raw code is automatically set LTR with the code font role.
+
+`persian-digits(value)` is an explicit formatter for strings and integers. It maps only ASCII `0`–`9` to Persian digits and preserves punctuation and all other string characters. It does not inspect or modify arbitrary Typst content, code, URLs, or math.
+
+```typ
+#import "@preview/dorost:0.1.0": document, ltr, persian-digits
+#show: document.with(lang: "fa", direction: "rtl")
+
+شناسه #ltr[API.get(2)] و تاریخ #ltr[#persian-digits("2026-10-11")]
+```
