@@ -18,4 +18,4 @@ Default document remains available.
 
 متن فارسی پیش از کد.
 
-#raw("API.get(2)")
+#raw("API.get(2)", block: true)

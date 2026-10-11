@@ -92,6 +92,7 @@ pdftotext "$work/document-compatibility.pdf" "$work/document-compatibility.txt"
 require_text "$work/document-compatibility.txt" 'Default document remains available.'
 require_text "$work/document-compatibility.txt" 'API.get(2'
 require_text "$work/document-compatibility.txt" 'فارسی'
+require_text "$root/tests/fixtures/document-compatibility.typ" 'API.get(2)'
 typst compile -f svg tests/fixtures/colors.typ "$work/colors.svg" "${compile_args[@]}"
 tr '[:upper:]' '[:lower:]' < "$work/colors.svg" > "$work/colors-lower.svg"
 for color in 102030 405060 708090 a0b0c0; do
