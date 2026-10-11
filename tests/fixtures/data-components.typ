@@ -22,7 +22,7 @@
 #show: document.with(lang: "fa", direction: "rtl")
 #section-title[فارسی]
 #labeled-field([نام فارسی], [مقدار فارسی])
-#choice-group(([گزینه فارسی], [گزینه دوم]), selected: 0, columns: 2)
+#choice-group(([گزینه فارسی], [گزینه دوم]), selected: 0, columns: 1)
 #data-table(2, (([عنوان فارسی], [ستون دوم]), ([متن فارسی], [داده دوم])))
 #data-table(2, (([بدون عنوان], [ردیف فارسی]),), header: false, align: "start")
 #border-frame(title: [عنوان فارسی])[قاب فارسی]
