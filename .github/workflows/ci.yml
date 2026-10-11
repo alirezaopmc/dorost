@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PDF text tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes poppler-utils
+      - name: Install Typst 0.15.1
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz \
+            --output /tmp/typst.tar.xz
+          tar -xJf /tmp/typst.tar.xz -C /tmp
+          echo "/tmp/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
+      - name: Verify package, examples, and starter
+        env:
+          DOROST_ARTIFACT_DIR: /tmp/dorost-artifacts
+        run: ./scripts/check.sh
+      - name: Check whitespace
+        run: git diff --check
+      - name: Upload rendered PDFs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dorost-pdfs
+          path: /tmp/dorost-artifacts/*.pdf
+          if-no-files-found: ignore

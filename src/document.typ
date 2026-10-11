@@ -25,6 +25,10 @@
   )
   set par-setter(leading: config.text.leading, spacing: config.text.paragraph-spacing)
   set list-setter(indent: config.text.list-indent, spacing: config.text.list-spacing)
+  show heading: set text-setter(fill: config.colors.accent)
+  show link: set text-setter(fill: config.colors.accent)
+  show footnote: set text-setter(fill: config.colors.muted)
+  show line: set line(stroke: config.colors.rule)
   show raw: element => {
     set text-setter(font: config.fonts.code, dir: ltr)
     element

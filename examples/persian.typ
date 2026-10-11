@@ -1,4 +1,4 @@
-#import "@preview/dorost:0.1.0": document, persian-digits
+#import "@preview/dorost:0.1.0": document, ltr, persian-digits
 
 #show: document.with(lang: "fa", direction: "rtl")
 
@@ -6,7 +6,7 @@
 
 این نمونه فقط قابلیت‌های پایهٔ نوشتار فارسی را نمایش می‌دهد: ی فارسی، ک فارسی و نیم‌فاصله در واژهٔ می‌روم.
 
-تبدیل رقم‌ها اختیاری است: #persian-digits("2026-10-11").
+تبدیل رقم‌ها اختیاری است: #ltr[#persian-digits("2026-10-11")].
 
 == ساختار در اختیار نویسنده است
 
