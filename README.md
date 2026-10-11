@@ -78,13 +78,13 @@ See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-t
 
 ## Development and verification
 
-Requires Typst 0.15.1 or later, `pdftotext`, and Python 3.11+ for the standard-library TOML and PNG checks. The minimum supported and current stable Typst version are both 0.15.1 at this pre-release stage.
+Requires Typst 0.15.1 or later, `pdftotext`, Python 3.11+, and internet access on the first test run to fetch checksum-pinned upstream test fonts. The minimum supported and current stable Typst version are both 0.15.1 at this pre-release stage.
 
 ```sh
 ./scripts/check.sh
 ```
 
-The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command with Typst 0.15.1.
+The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Test font binaries are downloaded from their upstream releases, checksum-verified, cached outside the repository, and removed from the build directory afterward. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command with Typst 0.15.1.
 
 ## License
 
@@ -92,4 +92,4 @@ Package code is MIT licensed. The copied starter in `template/` is MIT-0. Test-o
 
 ## Contributing and releases
 
-See [CONTRIBUTING.md](https://github.com/alirezaopmc/dorost/blob/main/CONTRIBUTING.md) for pull-request checks, scope, and the release process. Use [GitHub Issues](https://github.com/alirezaopmc/dorost/issues) for support and bug reports; see [SUPPORT.md](https://github.com/alirezaopmc/dorost/blob/main/SUPPORT.md). Report security issues privately as described in [SECURITY.md](https://github.com/alirezaopmc/dorost/blob/main/SECURITY.md). Repository-specific implementation guidance is in [AGENTS.md](https://github.com/alirezaopmc/dorost/blob/main/AGENTS.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for pull-request checks, scope, and the release process. Use [GitHub Issues](https://github.com/alirezaopmc/dorost/issues) for support and bug reports; see [SUPPORT.md](SUPPORT.md). Report security issues privately as described in [SECURITY.md](SECURITY.md).

@@ -11,6 +11,7 @@ with open(sys.argv[1], "rb") as manifest_file:
 PY
 )
 work=$(mktemp -d)
+python3 "$root/scripts/fetch-test-fonts.py" "$work/fonts"
 artifact_dir=${DOROST_ARTIFACT_DIR:-}
 if [[ -n "$artifact_dir" ]]; then
   mkdir -p "$artifact_dir"
@@ -42,7 +43,7 @@ require_text() {
 }
 
 cd "$root"
-compile_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$root/tests/fonts")
+compile_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$work/fonts")
 python3 - "$root" "$package_version" <<'PY'
 import re
 import sys
@@ -132,7 +133,7 @@ typst init "@local/dorost:$package_version" "$work/generated" \
   --package-path "$work/packages" \
   --package-cache-path "$work/cache"
 mkdir -p "$work/generated/fonts"
-cp -R "$root/tests/fonts/." "$work/generated/fonts/"
+cp -R "$work/fonts/." "$work/generated/fonts/"
 starter_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$work/generated/fonts")
 typst compile "$work/generated/main.typ" "$work/generated.pdf" "${starter_args[@]}"
 pdftotext "$work/generated.pdf" "$work/generated.txt"
