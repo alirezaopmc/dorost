@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: ["**"]
   pull_request:
 
 permissions:
@@ -11,7 +12,12 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
       - name: Install PDF text tools
         run: |
           sudo apt-get update
@@ -21,6 +27,8 @@ jobs:
           curl --fail --location --silent --show-error \
             https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz \
             --output /tmp/typst.tar.xz
+          echo "a6d077d0a95eed5a2eba715b2dae06be954f624ccbf85758a03f389ded33118c  /tmp/typst.tar.xz" \
+            | sha256sum --check --strict
           tar -xJf /tmp/typst.tar.xz -C /tmp
           echo "/tmp/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
       - name: Verify package, examples, and starter
@@ -28,10 +36,21 @@ jobs:
           DOROST_ARTIFACT_DIR: /tmp/dorost-artifacts
         run: ./scripts/check.sh
       - name: Check whitespace
-        run: git diff --check
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git diff --check "$BASE_SHA...HEAD"
+          elif [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            git diff --check HEAD^ HEAD
+          else
+            git diff --check "$BEFORE_SHA...HEAD"
+          fi
       - name: Upload rendered PDFs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dorost-pdfs
           path: /tmp/dorost-artifacts/*.pdf

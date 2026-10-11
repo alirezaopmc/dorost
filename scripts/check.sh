@@ -2,6 +2,14 @@
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
+package_version=$(python3 - "$root/typst.toml" <<'PY'
+import sys
+import tomllib
+
+with open(sys.argv[1], "rb") as manifest_file:
+    print(tomllib.load(manifest_file)["package"]["version"])
+PY
+)
 work=$(mktemp -d)
 artifact_dir=${DOROST_ARTIFACT_DIR:-}
 if [[ -n "$artifact_dir" ]]; then
@@ -18,10 +26,10 @@ trap cleanup EXIT
 # Mirror the source into local development and preview namespaces. This also
 # verifies that the same source works through both supported import names.
 for namespace in local preview; do
-  package="$work/packages/$namespace/dorost/0.1.0"
+  package="$work/packages/$namespace/dorost/$package_version"
   mkdir -p "$package"
   cp "$root/typst.toml" "$root/lib.typ" "$package/"
-  cp -R "$root/template" "$root/src" "$root/assets" "$package/"
+  cp -R "$root/template" "$root/src" "$package/"
 done
 
 require_text() {
@@ -34,7 +42,39 @@ require_text() {
 }
 
 cd "$root"
-compile_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$root/assets/fonts")
+compile_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$root/tests/fonts")
+python3 - "$root" "$package_version" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+version = sys.argv[2]
+pattern = re.compile(r"@(preview|local)/dorost:(\d+\.\d+\.\d+)")
+files = [root / "README.md", root / "template/main.typ"]
+files.extend(sorted((root / "examples").glob("*.typ")))
+files.extend(sorted((root / "tests/fixtures").glob("*.typ")))
+seen = {"preview": 0, "local": 0}
+for path in files:
+    text = path.read_text(encoding="utf-8")
+    matches = list(pattern.finditer(text))
+    if not matches:
+        raise SystemExit(f"missing Dorost import in {path.relative_to(root)}")
+    expected_namespace = "local" if path.is_relative_to(root / "tests") else "preview"
+    for match in matches:
+        namespace, found_version = match.groups()
+        if namespace != expected_namespace:
+            raise SystemExit(f"unexpected @{namespace} import in {path.relative_to(root)}")
+        if found_version != version:
+            raise SystemExit(
+                f"stale Dorost import in {path.relative_to(root)}: "
+                f"expected {version}, found {found_version}"
+            )
+        seen[namespace] += 1
+if not all(seen.values()):
+    raise SystemExit("expected both preview and local Dorost imports")
+PY
+python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
 for fixture in smoke document-config mixed-direction persian-digits colors; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
@@ -59,7 +99,6 @@ require_text "$work/mixed-direction.txt" 'شناسه'
 require_text "$work/mixed-direction.txt" 'فارسی'
 require_text "$work/mixed-direction.txt" 'English'
 require_text "$work/mixed-direction.txt" 'API.get(2'
-require_text "$work/mixed-direction.txt" ')'
 require_text "$work/mixed-direction.txt" 'https://example.com/a?b=2'
 require_text "$work/mixed-direction.txt" 'ی'
 require_text "$work/mixed-direction.txt" 'ک'
@@ -70,12 +109,18 @@ require_text "$work/example-persian.txt" 'سند فارسی'
 require_text "$work/example-english.txt" 'English document'
 require_text "$work/example-mixed-direction.txt" 'شناسه'
 
+# Validate authored Persian words exactly. Poppler can reorder characters and
+# punctuation within RTL PDF spans, so extraction is not a reliable source check.
+require_text "$root/tests/fixtures/mixed-direction.typ" 'می‌روم'
+require_text "$root/tests/fixtures/mixed-direction.typ" 'نیم‌فاصله'
+require_text "$root/tests/fixtures/mixed-direction.typ" 'API.get(2)'
+
 # The compiler must reject a malformed package manifest.
-malformed_package="$work/malformed-packages/local/dorost/0.1.0"
+malformed_package="$work/malformed-packages/local/dorost/$package_version"
 mkdir -p "$malformed_package"
-cp -R "$work/packages/local/dorost/0.1.0/." "$malformed_package/"
+cp -R "$work/packages/local/dorost/$package_version/." "$malformed_package/"
 printf '\nnot-valid = [\n' >> "$malformed_package/typst.toml"
-if typst init @local/dorost:0.1.0 "$work/malformed-project" \
+if typst init "@local/dorost:$package_version" "$work/malformed-project" \
   --package-path "$work/malformed-packages" \
   --package-cache-path "$work/malformed-cache" >"$work/malformed.log" 2>&1; then
   echo "expected Typst to reject malformed manifest" >&2
@@ -83,10 +128,13 @@ if typst init @local/dorost:0.1.0 "$work/malformed-project" \
 fi
 
 # Generate and compile the user-facing starter against the published import path.
-typst init @local/dorost:0.1.0 "$work/generated" \
+typst init "@local/dorost:$package_version" "$work/generated" \
   --package-path "$work/packages" \
   --package-cache-path "$work/cache"
-typst compile "$work/generated/main.typ" "$work/generated.pdf" "${compile_args[@]}"
+mkdir -p "$work/generated/fonts"
+cp -R "$root/tests/fonts/." "$work/generated/fonts/"
+starter_args=(--package-path "$work/packages" --ignore-system-fonts --font-path "$work/generated/fonts")
+typst compile "$work/generated/main.typ" "$work/generated.pdf" "${starter_args[@]}"
 pdftotext "$work/generated.pdf" "$work/generated.txt"
 require_text "$work/generated.txt" 'Start with Dorost'
 require_text "$work/generated.txt" 'Replace this sample with your own content.'
@@ -100,12 +148,17 @@ for fixture in tests/fixtures/invalid-*.typ; do
 done
 
 # Keep the registry preview within Typst's documented image size limit.
-python3 - "$root/template/thumbnail.png" <<'PY'
+python3 - "$root" <<'PY'
 import struct
 import sys
+import tomllib
 from pathlib import Path
 
-path = Path(sys.argv[1])
+root = Path(sys.argv[1])
+manifest = tomllib.loads((root / "typst.toml").read_text(encoding="utf-8"))
+path = root / manifest["template"]["thumbnail"]
+if not path.is_file():
+    raise SystemExit(f"template thumbnail does not exist: {path}")
 data = path.read_bytes()
 if data[:8] != b"\x89PNG\r\n\x1a\n":
     raise SystemExit("template thumbnail must be a PNG")

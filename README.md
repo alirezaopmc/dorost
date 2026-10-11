@@ -2,7 +2,7 @@
 
 **Dorost** (`درست`) is a use-case-neutral Typst package for English, Persian, and mixed-script documents. It provides shared page and typography defaults while leaving content, structure, and visual identity to each author.
 
-> Pre-release: the package is not published yet. Its planned package name is `@preview/dorost`; the API may still change before version 0.1.0.
+> Pre-release: the package is not yet available in Typst Universe. Its package name is `@preview/dorost`; the API may change before 1.0.0.
 
 ## Quick start
 
@@ -24,6 +24,16 @@ Write with native Typst headings, paragraphs, lists, tables, links, code, and ma
 ```
 
 The package is not tied to a university, course, proposal, thesis, report, or other document type. Consumers compose their own content and identity around the small core API.
+
+### Fonts
+
+The package names the Lora, Vazirmatn, and JetBrains Mono families, but does not distribute font files. Typst packages cannot make bundled fonts available to the compiler. Install those families on your system, or put their `.ttf` files in a project-local `fonts/` directory and compile with:
+
+```sh
+typst compile --font-path fonts main.typ
+```
+
+Get the fonts from the upstream [Lora](https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.021), [Vazirmatn](https://github.com/rastikerdar/vazirmatn/releases/tag/v33.003), and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304) releases. Dorost's test-only font copies and their OFL-1.1 notices are documented in [tests/fonts/README.md](tests/fonts/README.md); the package manifest excludes that directory.
 
 ## Configuration
 
@@ -49,7 +59,7 @@ Language, direction, font roles, and digit formatting are independent. `lang` is
 | `default-text` | 11 pt; 0.65 em leading; 1 em paragraph spacing; 0.6 em list indent and spacing |
 | `default-colors` | Body text; muted footnotes; accent headings and links; rule lines |
 
-Override either font role with a string or a Typst font fallback array. Fonts are bundled under their own licenses and loaded explicitly for local checks; see [`assets/fonts/README.md`](assets/fonts/README.md). Lora covers Latin; Vazirmatn supplies Persian glyphs. Vazirmatn includes regular and bold faces; Typst may synthesize other faces. Math uses Typst's embedded math font.
+Override either font role with a string or a Typst font fallback array. Lora covers Latin; Vazirmatn supplies Persian glyphs. Vazirmatn includes regular and bold faces; Typst may synthesize other faces. Math uses Typst's embedded math font. If the named fonts are unavailable, Typst warns and substitutes available fonts; Persian glyph coverage and layout can differ.
 
 ## Mixed direction and Persian digits
 
@@ -68,18 +78,18 @@ See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-t
 
 ## Development and verification
 
-Requires Typst 0.15.1 or later, `pdftotext`, and Python 3 for the standard-library PNG check. The minimum supported and current stable Typst version are both 0.15.1 at this pre-release stage.
+Requires Typst 0.15.1 or later, `pdftotext`, and Python 3.11+ for the standard-library TOML and PNG checks. The minimum supported and current stable Typst version are both 0.15.1 at this pre-release stage.
 
 ```sh
 ./scripts/check.sh
 ```
 
-The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, verifies extracted Persian/Latin content, checks manifest rejection, and initializes and compiles the starter in a temporary directory. Generated PDFs are removed after the run. GitHub Actions runs the same command with Typst 0.15.1.
+The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command with Typst 0.15.1.
 
 ## License
 
-Package code is MIT licensed. The copied starter in `template/` is MIT-0. The three bundled typefaces retain their upstream OFL-1.1 licenses and provenance. The manifest's SPDX expression is `MIT AND MIT-0 AND OFL-1.1`; the file-to-license mapping is documented here and beside the font assets. See [LICENSE](LICENSE), [LICENSE-MIT-0](LICENSE-MIT-0), and each font directory's `OFL.txt`.
+Package code is MIT licensed. The copied starter in `template/` is MIT-0. Test-only font fixtures retain their upstream OFL-1.1 licenses and provenance; they are excluded from the package. The package manifest's SPDX expression is `MIT AND MIT-0`. See [LICENSE](LICENSE), [LICENSE-MIT-0](LICENSE-MIT-0), and each test font directory's `OFL.txt`.
 
 ## Contributing and releases
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for pull-request checks, scope, and the reviewed release process. Repository-specific implementation guidance is in [AGENTS.md](AGENTS.md).
+See [CONTRIBUTING.md](https://github.com/alirezaopmc/dorost/blob/main/CONTRIBUTING.md) for pull-request checks, scope, and the release process. Use [GitHub Issues](https://github.com/alirezaopmc/dorost/issues) for support and bug reports; see [SUPPORT.md](https://github.com/alirezaopmc/dorost/blob/main/SUPPORT.md). Report security issues privately as described in [SECURITY.md](https://github.com/alirezaopmc/dorost/blob/main/SECURITY.md). Repository-specific implementation guidance is in [AGENTS.md](https://github.com/alirezaopmc/dorost/blob/main/AGENTS.md).

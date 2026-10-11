@@ -17,6 +17,27 @@ body:
       placeholder: 0.15.1
     validations:
       required: true
+  - type: input
+    id: dorost-version
+    attributes:
+      label: Dorost version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system and compile target
+      placeholder: macOS 15, PDF
+    validations:
+      required: false
+  - type: textarea
+    id: fonts
+    attributes:
+      label: Font setup
+      description: Were Lora, Vazirmatn, and JetBrains Mono installed or supplied with --font-path?
+    validations:
+      required: false
   - type: textarea
     id: expected
     attributes:

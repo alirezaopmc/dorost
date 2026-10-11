@@ -7,5 +7,5 @@
 - `document(direction:)` accepts `"ltr"` or `"rtl"`; `ltr` and `rtl` are content wrappers.
 - Persian digit conversion must be explicit; never mutate code, URLs, math, or arbitrary content.
 - Add a focused fixture before changing behavior; run `./scripts/check.sh`.
-- Preserve upstream font files, licenses, and provenance; do not add undocumented assets.
+- Keep font binaries limited to documented test fixtures under `tests/fonts/`; the Typst package excludes tests. Preserve upstream licenses and provenance.
 - Keep the package pure Typst; avoid adding a Rust runtime or unrelated dependencies.
