@@ -82,6 +82,44 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
 
+## Inline and content components
+
+The inline helpers make direction explicit where needed: `code-inline(value)`
+renders code with the code font in LTR order, while `math-inline(body)` keeps
+math LTR and leaves the surrounding text direction unchanged. `badge(body,
+tone: "accent")` accepts the tones `"neutral"`, `"accent"`, or `"muted"`.
+
+The block helpers accept native Typst content, so paragraphs and mixed English
+and Persian text inherit the surrounding language, direction, and fonts.
+Optional titles, attributions, and details disappear when omitted.
+
+| Function | Inputs and behavior |
+| --- | --- |
+| `note(body, title: none, tone: "neutral")` | Framed note with optional title; tone accepts `"neutral"`, `"accent"`, or `"muted"`. |
+| `quote-frame(body, attribution: none)` | Quotation with an optional caller-owned attribution. |
+| `prompt-example(label, body)` | Bold caller label followed by example content. |
+| `checklist(items)` | Native Typst list with checkbox markers; items must be an array of content. |
+| `resource-link(url, label, detail: none)` | Clickable URL label with optional muted detail text. |
+| `resource-links(..items)` | Vertical stack of positional resource-link content; named arguments are rejected. |
+
+```typ
+#import "@preview/dorost:0.2.0": code-inline, math-inline, badge, note, quote-frame, prompt-example, checklist, resource-link, resource-links, ltr, rtl
+
+API call: #code-inline("API.get(2)"); inline math: #math-inline[$x + 2$].
+#badge(tone: "muted")[Draft]
+#note(title: [A bilingual note])[
+  #ltr[Reference: DOROST-42]. #rtl[یادداشت فارسی]
+]
+#quote-frame(attribution: [A. Writer])[Give every voice room.]
+#prompt-example([Question])[
+  #rtl[چطور این بخش را ویرایش کنم؟]
+]
+#checklist(([Read the guide.], [Run the examples.]))
+#resource-links(
+  resource-link("https://typst.app", [Typst], detail: [Typesetting system]),
+)
+```
+
 ## Forms, tables, and frames
 
 These helpers accept caller-owned content and inherit the surrounding document's

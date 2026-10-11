@@ -166,6 +166,7 @@ assert re.search(r"(?m)^\s*7\s*$", pages[6]), "default numbering missing"
 PY_LAYOUT
 
 pdftotext "$work/components.pdf" "$work/components.txt"
+pdfinfo -url "$work/components.pdf" > "$work/components-urls.txt"
 typst compile tests/fixtures/components.typ "$work/inline-font.pdf" --pages 1 --no-pdf-tags "${compile_args[@]}"
 pdffonts "$work/inline-font.pdf" > "$work/inline-font.txt"
 require_text "$work/inline-font.txt" 'JetBrainsMono'
@@ -177,6 +178,11 @@ for label in 'API.get(2)' 'Accent badge' 'Neutral badge' 'Muted badge' \
   'Grouped detail' 'فارسی'; do
   require_text "$work/components.txt" "$label"
 done
+for url in 'https://example.com/one' 'https://example.com/two' \
+  'https://example.com/three' 'https://example.com/four' 'https://example.com/fa'; do
+  require_text "$work/components-urls.txt" "$url"
+done
+test "$(grep -c 'Annotation    https://example.com/' "$work/components-urls.txt")" -eq 5
 
 # Caller-owned data and selection markers must survive rendering in both directions.
 pdftotext -layout "$work/data-components.pdf" "$work/data-components.txt"
@@ -186,19 +192,25 @@ for label in 'English data components' 'Caller label' 'Caller value' 'Muted valu
   'First choice' 'Selected choice' 'Last choice' 'Unselected choice' '(x)' '( )' \
   'Header one' 'Header two' 'Cell one' 'Cell two' 'Plain one' 'Plain two' \
   'Start aligned' 'End aligned' 'Auto aligned' 'Single title' 'Double title' \
-  'Single frame body' 'Double frame body' 'No rule title' 'Untitled frame' 'فارسی'; do
+  'Single frame body' 'Double frame body' 'No rule title' 'Untitled frame' \
+  'نام' 'مقدار' 'گزینه' 'عنوان' 'قاب'; do
   require_text "$work/data-components.txt" "$label"
 done
 python3 - "$work/data-components-raw.txt" <<'PY_DATA'
 import sys
 from pathlib import Path
 pages = Path(sys.argv[1]).read_text().split("\f")
+pages = [page.translate({ord(char): None for char in "\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069"}) for page in pages]
 assert len([p for p in pages if p.strip()]) == 2, "expected two A4 data fixture pages"
 assert "(x) Selected choice" in pages[0], "selected index must mark the second English choice"
 assert pages[0].count("(x)") == 1, "expected exactly one selected English choice"
 assert pages[0].count("( )") == 3, "expected three unselected English choices"
 assert pages[1].count("(x)") == 1, "expected exactly one selected Persian choice"
 assert pages[1].count("( )") == 1, "expected one unselected Persian choice"
+assert "فارسی نام" in pages[1] and "فارسی مقدار" in pages[1], "Persian field content must survive"
+assert "(x) فارسی گزینه" in pages[1], "selected Persian choice must be the first item"
+assert "فارسی عنوان" in pages[1] and "فارسی متن" in pages[1], "Persian table content must survive"
+assert "فارسی قاب" in pages[1], "Persian frame content must survive"
 PY_DATA
 
 pdftotext "$work/document-config.pdf" "$work/document-config.txt"
