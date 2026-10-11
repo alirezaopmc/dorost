@@ -1,4 +1,4 @@
-#import "@local/dorost:0.1.0": document, ltr, persian-digits
+#import "@local/dorost:0.1.1": document, ltr, persian-digits
 
 #show: document.with(lang: "fa", direction: "rtl")
 

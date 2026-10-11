@@ -1,4 +1,4 @@
-#import "@preview/dorost:0.1.0": document
+#import "@preview/dorost:0.1.1": document
 
 #show: document.with(
   lang: "en",

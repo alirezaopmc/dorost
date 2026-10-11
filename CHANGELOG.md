@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-11
+
+### Changed
+
+- Declare Typst 0.15.0 as the minimum supported compiler version.
+
 ## [0.1.0] - 2026-10-11
 
 ### Added

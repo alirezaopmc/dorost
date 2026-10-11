@@ -11,6 +11,11 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typst-version: ["0.15.0", "0.15.1"]
+    name: Verify (Typst ${{ matrix.typst-version }})
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -22,12 +27,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes poppler-utils
-      - name: Install Typst 0.15.1
+      - name: Install Typst ${{ matrix.typst-version }}
+        env:
+          TYPST_VERSION: ${{ matrix.typst-version }}
         run: |
           curl --fail --location --silent --show-error \
-            https://github.com/typst/typst/releases/download/v0.15.1/typst-x86_64-unknown-linux-musl.tar.xz \
+            "https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz" \
             --output /tmp/typst.tar.xz
-          echo "a6d077d0a95eed5a2eba715b2dae06be954f624ccbf85758a03f389ded33118c  /tmp/typst.tar.xz" \
+          case "$TYPST_VERSION" in
+            0.15.0) checksum=59b207df01be2dab9f13e80f73d04d7ff8273ffd46b3dd1b9eef5c60f3eeabea ;;
+            0.15.1) checksum=a6d077d0a95eed5a2eba715b2dae06be954f624ccbf85758a03f389ded33118c ;;
+            *) echo "unsupported Typst version: $TYPST_VERSION" >&2; exit 1 ;;
+          esac
+          echo "$checksum  /tmp/typst.tar.xz" \
             | sha256sum --check --strict
           tar -xJf /tmp/typst.tar.xz -C /tmp
           echo "/tmp/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
@@ -52,6 +64,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dorost-pdfs
+          name: dorost-pdfs-typst-${{ matrix.typst-version }}
           path: /tmp/dorost-artifacts/*.pdf
           if-no-files-found: ignore

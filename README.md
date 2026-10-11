@@ -9,13 +9,13 @@
 After publication, create an editable starter with:
 
 ```sh
-typst init @preview/dorost:0.1.0
+typst init @preview/dorost:0.1.1
 ```
 
 Or use the package in an existing `.typ` file:
 
 ```typ
-#import "@preview/dorost:0.1.0": document
+#import "@preview/dorost:0.1.1": document
 #show: document.with(lang: "en", direction: "ltr")
 
 = Your title
@@ -68,7 +68,7 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 `persian-digits(value)` explicitly maps ASCII digits `0`–`9` to Persian digits in strings and integers. It preserves punctuation and other string characters. It does not inspect or modify arbitrary Typst content, code, URLs, or math.
 
 ```typ
-#import "@preview/dorost:0.1.0": document, ltr, persian-digits
+#import "@preview/dorost:0.1.1": document, ltr, persian-digits
 #show: document.with(lang: "fa", direction: "rtl")
 
 شناسه #ltr[API.get(2)] و تاریخ #ltr[#persian-digits("2026-10-11")]
@@ -78,13 +78,13 @@ See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-t
 
 ## Development and verification
 
-Requires Typst 0.15.1 or later, `pdftotext`, Python 3.11+, and internet access on the first test run to fetch checksum-pinned upstream test fonts. The minimum supported and current stable Typst version are both 0.15.1 at this pre-release stage.
+Requires Typst 0.15.0 or later, `pdftotext`, Python 3.11+, and internet access on the first test run to fetch checksum-pinned upstream test fonts. CI checks the minimum supported Typst version (0.15.0) and current stable version (0.15.1).
 
 ```sh
 ./scripts/check.sh
 ```
 
-The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Test font binaries are downloaded from their upstream releases, checksum-verified, cached outside the repository, and removed from the build directory afterward. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command with Typst 0.15.1.
+The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Test font binaries are downloaded from their upstream releases, checksum-verified, cached outside the repository, and removed from the build directory afterward. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command on both supported compiler versions.
 
 ## License
 
