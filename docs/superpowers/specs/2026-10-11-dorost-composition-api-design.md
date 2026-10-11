@@ -1,7 +1,7 @@
 # Dorost composition API design
 
-**Status:** Proposed for implementation planning  
-**Date:** 2026-10-11  
+**Status:** Proposed for implementation planning
+**Date:** 2026-10-11
 **Package:** `@preview/dorost`
 
 ## Goal
