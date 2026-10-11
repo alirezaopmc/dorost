@@ -1,8 +1,10 @@
 # Dorost composition API design
 
-**Status:** Proposed for implementation planning
+**Status:** Implemented in the `0.2.0` source on `main` (release not yet cut)
 **Date:** 2026-10-11
 **Package:** `@preview/dorost`
+
+This document records the design intent and scope. The illustrative API signatures below are not a reference manual; consult [`README.md`](../../../README.md) and [`lib.typ`](../../../lib.typ) for the current public API.
 
 ## Goal
 
