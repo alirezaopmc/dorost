@@ -2,6 +2,12 @@
 
 **Dorost** (`درست`) is a use-case-neutral Typst package for English, Persian, and mixed-script documents. It provides shared page and typography defaults while leaving content, structure, and visual identity to each author.
 
+| Cover | Bilingual body | Slides |
+| --- | --- | --- |
+| ![Dorost document cover with English and Persian title, author, and edition](assets/showcase-cover.png) | ![Dorost bilingual body with page chrome, notes, mixed-direction identifiers, and data table](assets/showcase-body.png) | ![Dorost slide columns with English and Persian notes and a page counter](assets/showcase-slides.png) |
+
+Explore the [editable showcase](examples/showcase.typ), or download the [document PDF](https://github.com/alirezaopmc/dorost/releases/latest/download/showcase-document.pdf) and [slide PDF](https://github.com/alirezaopmc/dorost/releases/latest/download/showcase-slides.pdf) attached to the latest GitHub release. The fictional Studio Cedar identity demonstrates caller-owned content.
+
 > Pre-release: the package is not yet available in Typst Universe. Its package name is `@preview/dorost`; the API may change before 1.0.0.
 
 ## Quick start
@@ -25,7 +31,7 @@ Write with native Typst headings, paragraphs, lists, tables, links, code, and ma
 
 The package is not tied to a university, course, proposal, thesis, report, or other document type. Consumers compose their own content and identity around the small core API.
 
-### Fonts
+## Fonts
 
 The package names the Lora, Vazirmatn, and JetBrains Mono families, but does not distribute font files. Typst packages cannot make bundled fonts available to the compiler. Install those families on your system, or put their `.ttf` files in a project-local `fonts/` directory and compile with:
 
@@ -183,7 +189,10 @@ Requires Typst 0.15.0 or later, `pdftotext`, Python 3.11+, and internet access o
 
 ```sh
 ./scripts/check.sh
+./scripts/render-showcase.sh build/showcase
 ```
+
+The renderer produces two PDFs and three PNG previews using the same checksum-pinned fonts and isolated package path as CI. It needs Poppler’s `pdftoppm`; generated PDFs stay outside git and the package.
 
 The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Test font binaries are downloaded from their upstream releases, checksum-verified, cached outside the repository, and removed from the build directory afterward. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command on both supported compiler versions.
 

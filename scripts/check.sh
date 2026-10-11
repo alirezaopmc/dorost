@@ -85,6 +85,25 @@ for example in examples/*.typ; do
   pdftotext -layout "$work/example-$name.pdf" "$work/example-$name.txt"
 done
 
+# Compile both selections of the editable showcase; keep release PDFs scoped.
+typst compile examples/showcase.typ "$work/showcase-slides.pdf" --input showcase=slides "${compile_args[@]}"
+pdftotext "$work/example-showcase.pdf" "$work/showcase-document.txt"
+pdftotext "$work/showcase-slides.pdf" "$work/showcase-slides.txt"
+python3 - "$work" <<'PY_SHOWCASE'
+import sys
+from pathlib import Path
+work = Path(sys.argv[1])
+for name, count, labels in (
+    ("document", 2, ("Mina Farzan", "Small pieces, clear structure", "Caller-owned data", "API.get(2)", "۲۰۲۶-۱۰-۱۱")),
+    ("slides", 4, ("Ideas across languages", "A shared composition", "English stays readable", "Give every voice room.")),
+):
+    text = (work / f"showcase-{name}.txt").read_text()
+    pages = [page for page in text.split("\f") if page.strip()]
+    assert len(pages) == count, f"unexpected showcase {name} page count: {len(pages)}"
+    for label in labels:
+        assert label in text, f"missing showcase {name} text: {label}"
+PY_SHOWCASE
+
 # Every slide layout, both ratios, and page/document isolation.
 pdftotext "$work/slides.pdf" "$work/slides.txt"
 python3 - "$work/slides.txt" <<'PY_SLIDES'
@@ -295,6 +314,20 @@ import tomllib
 from pathlib import Path
 
 root = Path(sys.argv[1])
+readme = (root / "README.md").read_text(encoding="utf-8")
+for kind in ("cover", "body", "slides"):
+    relative = f"assets/showcase-{kind}.png"
+    assert relative in readme, f"missing README preview reference: {relative}"
+    preview = (root / relative).read_bytes()
+    assert preview[:8] == b"\x89PNG\r\n\x1a\n", f"invalid PNG: {relative}"
+    w, h = struct.unpack(">II", preview[16:24])
+    assert 1080 <= max(w, h) <= 2400, f"unsuitable preview size: {w}x{h}"
+    assert len(preview) <= 1024 * 1024, f"preview exceeds 1 MiB: {relative}"
+assert readme.index("assets/showcase-cover.png") < readme.index("## Quick start")
+assert (root / "examples/showcase.typ").is_file()
+assert "examples/showcase.typ" in readme
+for kind in ("document", "slides"):
+    assert f"releases/latest/download/showcase-{kind}.pdf" in readme
 manifest = tomllib.loads((root / "typst.toml").read_text(encoding="utf-8"))
 path = root / manifest["template"]["thumbnail"]
 if not path.is_file():
