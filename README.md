@@ -33,7 +33,7 @@ The package names the Lora, Vazirmatn, and JetBrains Mono families, but does not
 typst compile --font-path fonts main.typ
 ```
 
-Get the fonts from the upstream [Lora](https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.021), [Vazirmatn](https://github.com/rastikerdar/vazirmatn/releases/tag/v33.003), and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304) releases. Dorost's test-only font copies and their OFL-1.1 notices are documented in [tests/fonts/README.md](tests/fonts/README.md); the package manifest excludes that directory.
+Get the fonts from the upstream [Lora](https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.021), [Vazirmatn](https://github.com/rastikerdar/vazirmatn/releases/tag/v33.003), and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304) releases. The automated checks fetch checksum-pinned test fonts from those releases; see [tests/fonts/README.md](tests/fonts/README.md).
 
 ## Configuration
 
@@ -88,7 +88,7 @@ The check compiles all fixtures and examples with system fonts disabled, tests c
 
 ## License
 
-Package code is MIT licensed. The copied starter in `template/` is MIT-0. Test-only font fixtures retain their upstream OFL-1.1 licenses and provenance; they are excluded from the package. The package manifest's SPDX expression is `MIT AND MIT-0`. See [LICENSE](LICENSE), [LICENSE-MIT-0](LICENSE-MIT-0), and each test font directory's `OFL.txt`.
+Package code is MIT licensed. The copied starter in `template/` is MIT-0. Tests fetch font fixtures from upstream releases under the SIL Open Font License 1.1; no font binaries are stored in this repository or included in the package. The package manifest's SPDX expression is `MIT AND MIT-0`. See [LICENSE](LICENSE), [LICENSE-MIT-0](LICENSE-MIT-0), and the upstream font releases linked in [tests/fonts/README.md](tests/fonts/README.md).
 
 ## Contributing and releases
 
