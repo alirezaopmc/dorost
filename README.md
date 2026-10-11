@@ -76,6 +76,33 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
 
+## Optional covers and page chrome
+
+`cover-page(title, subtitle: none, author: none, date: none, logo: none, details: none)`
+composes caller-provided content in a vertical block. Optional slots disappear when
+omitted. Supply any labels and logo yourself; content helpers can be used in slots.
+It inserts no page breaks. Callers choose cover placement and page boundaries.
+
+`page-chrome(body, header: none, footer: none, numbering: true, rule: true)`
+sets native Typst page settings locally for its body. Headers and footers follow
+the surrounding text direction. `numbering` and `rule` accept booleans only;
+numbering uses the native, continuous page counter with Arabic decimal digits.
+Rules appear below a supplied header and above a footer or page number. Native
+page settings create page boundaries when entering/leaving the wrapper; use it
+around page content rather than inside a block, grid, or other container.
+
+```typ
+#import "@preview/dorost:0.1.1": document, cover-page, page-chrome
+#show: document.with(lang: "en", direction: "ltr")
+
+#cover-page([Your title], subtitle: [Your subtitle], author: [Your name])
+#pagebreak()
+#page-chrome(header: [Your header], footer: [Your footer])[
+  = Your content
+  Write your document here.
+]
+```
+
 ## Development and verification
 
 Requires Typst 0.15.0 or later, `pdftotext`, Python 3.11+, and internet access on the first test run to fetch checksum-pinned upstream test fonts. CI checks the minimum supported Typst version (0.15.0) and current stable version (0.15.1).

@@ -11,3 +11,5 @@
 #import "src/components/inline.typ": code-inline, math-inline, badge
 #import "src/components/blocks.typ": note, quote-frame, prompt-example, checklist
 #import "src/components/resources.typ": resource-link, resource-links
+#import "src/layout/cover.typ": cover-page
+#import "src/layout/page-chrome.typ": page-chrome

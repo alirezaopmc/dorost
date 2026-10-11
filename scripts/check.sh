@@ -76,7 +76,7 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
@@ -84,6 +84,34 @@ for example in examples/*.typ; do
   typst compile "$example" "$work/example-$name.pdf" "${compile_args[@]}"
   pdftotext -layout "$work/example-$name.pdf" "$work/example-$name.txt"
 done
+
+# Cover slots, repeated chrome, numbering, and local page settings.
+pdftotext "$work/document-layouts.pdf" "$work/document-layouts.txt"
+python3 - "$work/document-layouts.txt" <<'PY_LAYOUT'
+import re
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+if not pages[-1].strip():
+    pages.pop()
+assert len(pages) == 7, f"expected 7 layout pages, got {len(pages)}"
+for value in ("English cover", "Caller subtitle", "Ada Example", "2026-10-11", "Caller logo", "Caller details"):
+    assert value in pages[0], f"missing cover slot: {value}"
+assert "فارسی" in pages[1]
+for label in ("Author", "Date", "Logo", "Subtitle", "Details", "Ada Example", "2026-10-11"):
+    assert label not in pages[1], f"unexpected omitted slot: {label}"
+for index, body in ((2, "First chrome body."), (3, "Second chrome body.")):
+    assert body in pages[index]
+    assert "English header" in pages[index] and "Caller footer" in pages[index]
+    assert re.search(rf"(?m)^\s*{index + 1}\s*$", pages[index]), "missing page number"
+assert "Outside wrapper body." in pages[4]
+assert "English header" not in pages[4] and "Caller footer" not in pages[4], "chrome leaked"
+assert not re.search(r"(?m)^\s*5\s*$", pages[4]), "numbering leaked"
+assert "RTL header" in pages[5] and "RTL footer" in pages[5]
+assert not re.search(r"(?m)^\s*6\s*$", pages[5]), "numbering false ignored"
+assert "Default chrome body." in pages[6]
+assert re.search(r"(?m)^\s*7\s*$", pages[6]), "default numbering missing"
+PY_LAYOUT
 
 pdftotext "$work/components.pdf" "$work/components.txt"
 typst compile tests/fixtures/components.typ "$work/inline-font.pdf" --pages 1 --no-pdf-tags "${compile_args[@]}"
@@ -172,6 +200,15 @@ for component in badge note; do
     exit 1
   fi
   require_text "$work/invalid.log" 'dorost: tone must be'
+done
+
+for option in numbering rule; do
+  if typst compile tests/fixtures/invalid-page-chrome.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid page-chrome $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" "dorost: $option must be a boolean"
 done
 
 # Keep the registry preview within Typst's documented image size limit.
