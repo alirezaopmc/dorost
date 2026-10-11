@@ -1,4 +1,4 @@
-#import "@local/dorost:0.1.1": document, ltr, rtl
+#import "@local/dorost:0.2.0": document, ltr, rtl
 
 #show: document.with(lang: "fa", direction: "rtl")
 

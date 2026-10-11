@@ -76,7 +76,7 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config mixed-direction persian-digits colors; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts data-components slides; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
 for example in examples/*.typ; do
@@ -85,9 +85,144 @@ for example in examples/*.typ; do
   pdftotext -layout "$work/example-$name.pdf" "$work/example-$name.txt"
 done
 
+# Compile both selections of the editable showcase; keep release PDFs scoped.
+typst compile examples/showcase.typ "$work/showcase-slides.pdf" --input showcase=slides "${compile_args[@]}"
+pdftotext "$work/example-showcase.pdf" "$work/showcase-document.txt"
+pdftotext "$work/showcase-slides.pdf" "$work/showcase-slides.txt"
+python3 - "$work" <<'PY_SHOWCASE'
+import sys
+from pathlib import Path
+work = Path(sys.argv[1])
+for name, count, labels in (
+    ("document", 2, ("Mina Farzan", "Small pieces, clear structure", "Caller-owned data", "API.get(2)", "۲۰۲۶-۱۰-۱۱")),
+    ("slides", 4, ("Ideas across languages", "A shared composition", "English stays readable", "Give every voice room.")),
+):
+    text = (work / f"showcase-{name}.txt").read_text()
+    pages = [page for page in text.split("\f") if page.strip()]
+    assert len(pages) == count, f"unexpected showcase {name} page count: {len(pages)}"
+    for label in labels:
+        assert label in text, f"missing showcase {name} text: {label}"
+PY_SHOWCASE
+
+# Every slide layout, both ratios, and page/document isolation.
+pdftotext "$work/slides.pdf" "$work/slides.txt"
+python3 - "$work/slides.txt" <<'PY_SLIDES'
+import re
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+if not pages[-1].strip():
+    pages.pop()
+assert len(pages) == 16, f"expected 16 slide/document pages, got {len(pages)}"
+for i, label in enumerate(("Slide cover", "Slide section", "Slide content", "Slide columns", None, "Slide image text", "Caller statement")):
+    if label:
+        assert label in pages[i], f"missing slide layout: {label}"
+    assert "Caller slide footer" in pages[i], f"missing slide footer: {i}"
+    assert re.search(rf"(?m)^\s*{i + 1}\s*$", pages[i]), f"missing slide counter: {i}"
+for label in ("Caller subtitle", "Ada Example", "2026-10-11"):
+    assert label in pages[0]
+for label in ("Start column", "End column"):
+    assert label in pages[3]
+assert "Image text body" in pages[5]
+assert "Caller attribution" in pages[6]
+assert "Ordinary document after slides." in pages[7]
+assert "Persian document after slides." in pages[15]
+for i in range(7, 16):
+    assert "Caller slide footer" not in pages[i], "slide footer leaked"
+    assert not re.search(rf"(?m)^\s*{i + 1}\s*$", pages[i]), "slide counter leaked or false ignored"
+assert "فارسی" in "".join(pages[8:])
+assert "Untitled content" in pages[10]
+assert "Unattributed statement" in pages[14]
+for label in ("Ada Example", "2026-10-11", "Caller subtitle", "Caller attribution"):
+    assert label not in "".join(pages[8:]), f"omitted slot emitted: {label}"
+PY_SLIDES
+
+# Cover slots, repeated chrome, numbering, and local page settings.
+pdftotext "$work/document-layouts.pdf" "$work/document-layouts.txt"
+python3 - "$work/document-layouts.txt" <<'PY_LAYOUT'
+import re
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+if not pages[-1].strip():
+    pages.pop()
+assert len(pages) == 7, f"expected 7 layout pages, got {len(pages)}"
+for value in ("English cover", "Caller subtitle", "Ada Example", "2026-10-11", "Caller logo", "Caller details"):
+    assert value in pages[0], f"missing cover slot: {value}"
+assert "فارسی" in pages[1]
+for label in ("Author", "Date", "Logo", "Subtitle", "Details", "Ada Example", "2026-10-11"):
+    assert label not in pages[1], f"unexpected omitted slot: {label}"
+for index, body in ((2, "First chrome body."), (3, "Second chrome body.")):
+    assert body in pages[index]
+    assert "English header" in pages[index] and "Caller footer" in pages[index]
+    assert re.search(rf"(?m)^\s*{index + 1}\s*$", pages[index]), "missing page number"
+assert "Outside wrapper body." in pages[4]
+assert "English header" not in pages[4] and "Caller footer" not in pages[4], "chrome leaked"
+assert not re.search(r"(?m)^\s*5\s*$", pages[4]), "numbering leaked"
+assert "RTL header" in pages[5] and "RTL footer" in pages[5]
+assert not re.search(r"(?m)^\s*6\s*$", pages[5]), "numbering false ignored"
+assert "Default chrome body." in pages[6]
+assert re.search(r"(?m)^\s*7\s*$", pages[6]), "default numbering missing"
+PY_LAYOUT
+
+pdftotext "$work/components.pdf" "$work/components.txt"
+pdfinfo -url "$work/components.pdf" > "$work/components-urls.txt"
+typst compile tests/fixtures/components.typ "$work/inline-font.pdf" --pages 1 --no-pdf-tags "${compile_args[@]}"
+pdffonts "$work/inline-font.pdf" > "$work/inline-font.txt"
+require_text "$work/inline-font.txt" 'JetBrainsMono'
+for label in 'API.get(2)' 'Accent badge' 'Neutral badge' 'Muted badge' \
+  'Default note body' 'Note title' 'Titled note body' 'Muted note body' \
+  'Default quotation' 'Quoted author' 'Attributed quotation' 'Prompt label' \
+  'Prompt body' 'First checklist item' 'Second checklist item' 'Single resource' \
+  'Detailed resource' 'Resource detail' 'Grouped resource one' 'Grouped resource two' \
+  'Grouped detail' 'فارسی'; do
+  require_text "$work/components.txt" "$label"
+done
+for url in 'https://example.com/one' 'https://example.com/two' \
+  'https://example.com/three' 'https://example.com/four' 'https://example.com/fa'; do
+  require_text "$work/components-urls.txt" "$url"
+done
+test "$(grep -c 'Annotation    https://example.com/' "$work/components-urls.txt")" -eq 5
+
+# Caller-owned data and selection markers must survive rendering in both directions.
+pdftotext -layout "$work/data-components.pdf" "$work/data-components.txt"
+# Raw order keeps LTR marker punctuation together inside RTL choice rows.
+pdftotext -raw "$work/data-components.pdf" "$work/data-components-raw.txt"
+for label in 'English data components' 'Caller label' 'Caller value' 'Muted value' \
+  'First choice' 'Selected choice' 'Last choice' 'Unselected choice' '(x)' '( )' \
+  'Header one' 'Header two' 'Cell one' 'Cell two' 'Plain one' 'Plain two' \
+  'Start aligned' 'End aligned' 'Auto aligned' 'Single title' 'Double title' \
+  'Single frame body' 'Double frame body' 'No rule title' 'Untitled frame' \
+  'نام' 'مقدار' 'گزینه' 'عنوان' 'قاب'; do
+  require_text "$work/data-components.txt" "$label"
+done
+python3 - "$work/data-components-raw.txt" <<'PY_DATA'
+import re
+import sys
+from pathlib import Path
+pages = Path(sys.argv[1]).read_text().split("\f")
+pages = [page.translate({ord(char): None for char in "\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069"}) for page in pages]
+assert len([p for p in pages if p.strip()]) == 2, "expected two A4 data fixture pages"
+assert "(x) Selected choice" in pages[0], "selected index must mark the second English choice"
+assert pages[0].count("(x)") == 1, "expected exactly one selected English choice"
+assert pages[0].count("( )") == 3, "expected three unselected English choices"
+assert pages[1].count("(x)") == 1, "expected exactly one selected Persian choice"
+assert pages[1].count("( )") == 1, "expected one unselected Persian choice"
+assert "فارسی نام" in pages[1] and "فارسی مقدار" in pages[1], "Persian field content must survive"
+assert re.search(r"\(x\)\s+فارسی گزینه", pages[1]), \
+    "selected Persian marker must precede the first option"
+assert "فارسی عنوان" in pages[1] and "فارسی متن" in pages[1], "Persian table content must survive"
+assert "فارسی قاب" in pages[1], "Persian frame content must survive"
+PY_DATA
+
 pdftotext "$work/document-config.pdf" "$work/document-config.txt"
 require_text "$work/document-config.txt" 'English LTR defaults remain explicit.'
 require_text "$work/document-config.txt" 'API.get(2)'
+pdftotext "$work/document-compatibility.pdf" "$work/document-compatibility.txt"
+require_text "$work/document-compatibility.txt" 'Default document remains available.'
+require_text "$work/document-compatibility.txt" 'API.get(2'
+require_text "$work/document-compatibility.txt" 'فارسی'
+require_text "$root/tests/fixtures/document-compatibility.typ" 'API.get(2)'
 typst compile -f svg tests/fixtures/colors.typ "$work/colors.svg" "${compile_args[@]}"
 tr '[:upper:]' '[:lower:]' < "$work/colors.svg" > "$work/colors-lower.svg"
 for color in 102030 405060 708090 a0b0c0; do
@@ -147,6 +282,43 @@ for fixture in tests/fixtures/invalid-*.typ; do
   fi
   grep -Fq 'dorost:' "$work/invalid.log"
 done
+for component in badge note; do
+  if typst compile tests/fixtures/invalid-component-options.typ "$work/invalid.pdf" \
+    --input "component=$component" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid $component tone failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost: tone must be'
+done
+
+for option in numbering rule; do
+  if typst compile tests/fixtures/invalid-page-chrome.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid page-chrome $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" "dorost: $option must be a boolean"
+done
+
+for option in columns-zero columns-fraction columns-type rows-type row-type row-width \
+  align header frame-style choice-columns-zero choice-columns-fraction choice-items \
+  choice-content selected-negative selected-outside selected-type selected-empty label-style section-rule; do
+  if typst compile tests/fixtures/invalid-data-table.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid data component $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost:'
+done
+
+for option in ratio counter fit text-fit side; do
+  if typst compile tests/fixtures/invalid-slide-options.typ "$work/invalid.pdf" \
+    --input "option=$option" "${compile_args[@]}" >"$work/invalid.log" 2>&1; then
+    echo "expected invalid slide $option failure" >&2
+    exit 1
+  fi
+  require_text "$work/invalid.log" 'dorost:'
+done
 
 # Keep the registry preview within Typst's documented image size limit.
 python3 - "$root" <<'PY'
@@ -156,6 +328,20 @@ import tomllib
 from pathlib import Path
 
 root = Path(sys.argv[1])
+readme = (root / "README.md").read_text(encoding="utf-8")
+for kind in ("cover", "body", "slides"):
+    relative = f"assets/showcase-{kind}.png"
+    assert relative in readme, f"missing README preview reference: {relative}"
+    preview = (root / relative).read_bytes()
+    assert preview[:8] == b"\x89PNG\r\n\x1a\n", f"invalid PNG: {relative}"
+    w, h = struct.unpack(">II", preview[16:24])
+    assert 1080 <= max(w, h) <= 2400, f"unsuitable preview size: {w}x{h}"
+    assert len(preview) <= 1024 * 1024, f"preview exceeds 1 MiB: {relative}"
+assert readme.index("assets/showcase-cover.png") < readme.index("## Quick start")
+assert (root / "examples/showcase.typ").is_file()
+assert "examples/showcase.typ" in readme
+for kind in ("document", "slides"):
+    assert f"releases/latest/download/showcase-{kind}.pdf" in readme
 manifest = tomllib.loads((root / "typst.toml").read_text(encoding="utf-8"))
 path = root / manifest["template"]["thumbnail"]
 if not path.is_file():

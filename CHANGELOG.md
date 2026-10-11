@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-11
+
+### Added
+
+- Add optional reusable document components, cover and page chrome layouts, and slide layouts.
+- Add an editable bilingual showcase with README preview images and release PDF artifacts.
+
 ## [0.1.1] - 2026-10-11
 
 ### Changed
