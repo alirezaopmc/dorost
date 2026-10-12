@@ -76,9 +76,12 @@ if not all(seen.values()):
     raise SystemExit("expected both preview and local Dorost imports")
 PY
 python3 "$root/scripts/release-notes.py" "v$package_version" >/dev/null
-for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components document-layouts data-components slides; do
+for fixture in smoke document-config document-compatibility mixed-direction persian-digits colors components code-inline document-layouts data-components slides; do
   typst compile "tests/fixtures/$fixture.typ" "$work/$fixture.pdf" "${compile_args[@]}"
 done
+pdftotext -layout "$work/code-inline.pdf" "$work/code-inline.txt"
+require_text "$work/code-inline.txt" 'value != other && first->second'
+require_text "$work/code-inline.txt" 'ادامهٔ فارسی'
 for example in examples/*.typ; do
   name=$(basename "$example" .typ)
   typst compile "$example" "$work/example-$name.pdf" "${compile_args[@]}"

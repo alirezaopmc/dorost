@@ -1,4 +1,4 @@
-#import "@local/dorost:0.2.0": document, slides, slide-cover, slide-section, slide-content, slide-columns, slide-image, slide-image-text, slide-statement, rtl, ltr, badge
+#import "@local/dorost:0.2.1": document, slides, slide-cover, slide-section, slide-content, slide-columns, slide-image, slide-image-text, slide-statement, rtl, ltr, badge
 #show: document.with(lang: "en", direction: "ltr")
 
 #slides(footer: [Caller slide footer])[

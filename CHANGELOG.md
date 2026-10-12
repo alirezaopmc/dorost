@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-12
+
+### Changed
+
+- Allow `code-inline` callers to set a font and size, defaulting to the configured code font and inherited size.
+- Disable ligatures and contextual substitutions in inline code so operators retain their source characters.
+
 ## [0.2.0] - 2026-10-11
 
 ### Added

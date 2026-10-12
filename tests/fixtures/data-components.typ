@@ -1,4 +1,4 @@
-#import "@local/dorost:0.2.0": document, labeled-field, choice-group, data-table, border-frame, section-title
+#import "@local/dorost:0.2.1": document, labeled-field, choice-group, data-table, border-frame, section-title
 
 #show: document.with(lang: "en", direction: "ltr")
 #section-title[English data components]
