@@ -87,6 +87,16 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
 
+## Spacing
+
+`document` sets paragraph and list gaps through `text.paragraph-spacing` and `text.list-spacing`. The helper blocks (`note`, `border-frame`, `prompt-example`, `quote-frame`) leave their vertical gaps automatic, so they follow the paragraph gap. Typst collapses adjacent gaps to the larger of the two, and a block set to `above: 0pt` directly after a paragraph can paint over that paragraph's last line. Keep the automatic gap on blocks you add yourself.
+
+`document` does not set heading spacing, so headings use Typst's defaults. A heading's `below` value takes effect only when it exceeds the paragraph gap. Documents that need a specific heading rhythm set it with a show rule:
+
+```typ
+#show heading.where(level: 2): set block(above: 1.2em, below: 0.8em)
+```
+
 ## Inline and content components
 
 The inline helpers make direction explicit where needed: `code-inline(value,

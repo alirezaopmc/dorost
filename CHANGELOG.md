@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Document how helper blocks and headings take vertical spacing from the surrounding document. No runtime behavior changed.
+
 ## [0.2.1] - 2026-10-12
 
 ### Changed
