@@ -15,13 +15,13 @@ Explore the [editable showcase](examples/showcase.typ), or download the [documen
 After publication, create an editable starter with:
 
 ```sh
-typst init @preview/dorost:0.2.0
+typst init @preview/dorost:0.2.1
 ```
 
 Or use the package in an existing `.typ` file:
 
 ```typ
-#import "@preview/dorost:0.2.0": document
+#import "@preview/dorost:0.2.1": document
 #show: document.with(lang: "en", direction: "ltr")
 
 = Your title
@@ -74,7 +74,7 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 `persian-digits(value)` explicitly maps ASCII digits `0`–`9` to Persian digits in strings and integers. For Typst numbering, use its native Persian counting symbol (`"۱"`, or `"۱.۱"` for nested levels) in the relevant numbering parameter. Page numbering remains unchanged unless configured. The helper does not inspect or modify arbitrary Typst content, code, URLs, or math.
 
 ```typ
-#import "@preview/dorost:0.2.0": document, ltr, persian-digits
+#import "@preview/dorost:0.2.1": document, ltr, persian-digits
 #show: document.with(lang: "fa", direction: "rtl")
 #set footnote(numbering: "۱")
 
@@ -87,10 +87,23 @@ Override either font role with a string or a Typst font fallback array. Lora cov
 
 See [`examples/`](examples/) for English, Persian, mixed-direction, and custom-theme sources.
 
+## Spacing
+
+`document` sets paragraph and list gaps through `text.paragraph-spacing` and `text.list-spacing`. The helper blocks (`note`, `border-frame`, `prompt-example`, `quote-frame`) leave their vertical gaps automatic, so they follow the paragraph gap. Typst collapses adjacent gaps to the larger of the two, and a block set to `above: 0pt` directly after a paragraph can paint over that paragraph's last line. Keep the automatic gap on blocks you add yourself.
+
+`document` does not set heading spacing, so headings use Typst's defaults. A heading's `below` value takes effect only when it exceeds the paragraph gap. Documents that need a specific heading rhythm set it with a show rule:
+
+```typ
+#show heading.where(level: 2): set block(above: 1.2em, below: 0.8em)
+```
+
 ## Inline and content components
 
-The inline helpers make direction explicit where needed: `code-inline(value)`
-renders code with the code font in LTR order, while `math-inline(body)` keeps
+The inline helpers make direction explicit where needed: `code-inline(value,
+font: default-fonts.code, size: none)` renders code with the selected code font
+in LTR order, with ligatures and contextual substitutions disabled so code
+operators retain their written shape. Its optional size is useful when inline
+code should be smaller than body text. `math-inline(body)` keeps
 math LTR and leaves the surrounding text direction unchanged. `badge(body,
 tone: "accent")` accepts the tones `"neutral"`, `"accent"`, or `"muted"`.
 
@@ -108,7 +121,7 @@ Optional titles, attributions, and details disappear when omitted.
 | `resource-links(..items)` | Vertical stack of positional resource-link content; named arguments are rejected. |
 
 ```typ
-#import "@preview/dorost:0.2.0": code-inline, math-inline, badge, note, quote-frame, prompt-example, checklist, resource-link, resource-links, ltr, rtl
+#import "@preview/dorost:0.2.1": code-inline, math-inline, badge, note, quote-frame, prompt-example, checklist, resource-link, resource-links, ltr, rtl
 
 API call: #code-inline("API.get(2)"); inline math: #math-inline[$x + 2$].
 #badge(tone: "muted")[Draft]
@@ -144,7 +157,7 @@ column ordering and choice marker placement. Unsupported options and malformed t
 choice inputs produce `dorost:` diagnostics.
 
 ```typ
-#import "@preview/dorost:0.2.0": labeled-field, choice-group, data-table, border-frame, section-title
+#import "@preview/dorost:0.2.1": labeled-field, choice-group, data-table, border-frame, section-title
 
 #section-title[Your section]
 #labeled-field([Your label], [Your value])
@@ -169,7 +182,7 @@ page settings create page boundaries when entering/leaving the wrapper; use it
 around page content rather than inside a block, grid, or other container.
 
 ```typ
-#import "@preview/dorost:0.2.0": document, cover-page, page-chrome
+#import "@preview/dorost:0.2.1": document, cover-page, page-chrome
 #show: document.with(lang: "en", direction: "ltr")
 
 #cover-page([Your title], subtitle: [Your subtitle], author: [Your name])
@@ -215,7 +228,7 @@ or fetched by these helpers. Invalid ratios, image fitting, image sides, and
 counter flags produce `dorost:` diagnostics.
 
 ```typ
-#import "@preview/dorost:0.2.0": document, slides, slide-cover, slide-content, slide-image-text
+#import "@preview/dorost:0.2.1": document, slides, slide-cover, slide-content, slide-image-text
 #show: document.with(lang: "en", direction: "ltr")
 
 #slides(footer: [Your footer])[

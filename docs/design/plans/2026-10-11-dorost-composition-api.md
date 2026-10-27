@@ -1,6 +1,6 @@
 # Dorost composition API Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Expand Dorost into a use-case-neutral English/Persian Typst composition package with document layout, reusable content components, slide layouts, and a prominent visual showcase.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Typst 0.15.0+, Bash, Python 3.11+, Poppler (`pdftotext` and `pdftoppm`), GitHub Actions.
 
-**Spec:** `docs/superpowers/specs/2026-10-11-dorost-composition-api-design.md`
+**Spec:** `docs/design/specs/2026-10-11-dorost-composition-api-design.md`
 
 ## Global Constraints
 

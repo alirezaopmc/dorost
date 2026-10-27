@@ -1,4 +1,4 @@
-#import "@preview/dorost:0.2.0": document, ltr, persian-digits
+#import "@preview/dorost:0.2.1": document, ltr, persian-digits
 
 #show: document.with(lang: "fa", direction: "rtl")
 #set footnote(numbering: "۱")

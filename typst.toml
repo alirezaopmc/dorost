@@ -1,6 +1,6 @@
 [package]
 name = "dorost"
-version = "0.2.0"
+version = "0.2.1"
 entrypoint = "lib.typ"
 authors = ["Alireza Jafartash <@alirezaopmc>"]
 license = "MIT AND MIT-0"

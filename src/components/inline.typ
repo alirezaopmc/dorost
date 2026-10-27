@@ -8,9 +8,10 @@
   else { panic("dorost: tone must be \"neutral\", \"accent\", or \"muted\"") }
 }
 
-#let code-inline(value) = box({
-  set text(dir: ltr, font: default-fonts.code)
-  show raw: set text(dir: ltr, font: default-fonts.code)
+#let code-inline(value, font: default-fonts.code, size: none) = box({
+  set text(dir: ltr, lang: "en", font: font, ligatures: false, features: (calt: 0, liga: 0))
+  show raw: set text(dir: ltr, lang: "en", font: font, ligatures: false, features: (calt: 0, liga: 0))
+  if size != none { set text(size: size) }
   raw(value, block: false)
 })
 

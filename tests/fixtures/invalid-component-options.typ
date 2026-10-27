@@ -1,4 +1,4 @@
-#import "@local/dorost:0.2.0": badge, note
+#import "@local/dorost:0.2.1": badge, note
 
 #let component = sys.inputs.at("component", default: "badge")
 #if component == "badge" {

@@ -1,4 +1,4 @@
-#import "@preview/dorost:0.2.0": document, cover-page, page-chrome, section-title, badge, note, quote-frame, prompt-example, checklist, labeled-field, data-table, code-inline, resource-link, ltr, rtl, persian-digits, slides, slide-cover, slide-columns, slide-content, slide-statement
+#import "@preview/dorost:0.2.1": document, cover-page, page-chrome, section-title, badge, note, quote-frame, prompt-example, checklist, labeled-field, data-table, code-inline, resource-link, ltr, rtl, persian-digits, slides, slide-cover, slide-columns, slide-content, slide-statement
 
 // One editable source, two outputs: --input showcase=document|slides.
 #let mode = sys.inputs.at("showcase", default: "document")

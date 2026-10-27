@@ -1,4 +1,4 @@
-#import "@local/dorost:0.2.0": document, code-inline, math-inline, badge, note, quote-frame, prompt-example, checklist, resource-link, resource-links
+#import "@local/dorost:0.2.1": document, code-inline, math-inline, badge, note, quote-frame, prompt-example, checklist, resource-link, resource-links
 
 // A standalone first page catches native raw's fallback font overriding code-inline.
 #code-inline("Standalone code font")
