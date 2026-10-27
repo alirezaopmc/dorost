@@ -1,4 +1,4 @@
-#import "@local/dorost:0.2.0": data-table, border-frame, choice-group, labeled-field, section-title
+#import "@local/dorost:0.2.1": data-table, border-frame, choice-group, labeled-field, section-title
 
 #let option = sys.inputs.at("option", default: "columns-zero")
 #if option == "columns-zero" {

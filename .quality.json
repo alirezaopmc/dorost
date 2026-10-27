@@ -1,0 +1,10 @@
+{
+	"version": 1,
+	"checks": [
+		{
+			"name": "check",
+			"kind": "test",
+			"argv": ["bash", "scripts/check.sh"]
+		}
+	]
+}

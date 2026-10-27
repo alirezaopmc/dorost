@@ -30,7 +30,7 @@
   show footnote: set text-setter(fill: config.colors.muted)
   show line: set line(stroke: config.colors.rule)
   show raw: element => {
-    set text-setter(font: config.fonts.code, dir: ltr)
+    set text-setter(font: config.fonts.code, dir: ltr, ligatures: false, features: (calt: 0, liga: 0))
     element
   }
   body
