@@ -375,4 +375,8 @@ if len(data) > 3 * 1024 * 1024:
     raise SystemExit(f"template thumbnail exceeds 3 MiB: {len(data)} bytes")
 PY
 
+# Focused regression tests: public helpers, the starter, and every example PDF.
+DOROST_TEST_FONTS="$work/fonts" DOROST_TEST_PACKAGE_PATH="$work/packages" \
+  bash "$root/tests/test-package.sh"
+
 echo "OK: manifest, package, examples, bilingual text, starter init, and validation fixtures"
