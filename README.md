@@ -252,6 +252,14 @@ The renderer produces two PDFs and three PNG previews using the same checksum-pi
 
 The check compiles all fixtures and examples with system fonts disabled, tests configuration failures, checks PDF text extraction, validates the template thumbnail path, checks manifest rejection, and initializes and compiles the starter in a temporary directory with project-local fonts. Test font binaries are downloaded from their upstream releases, checksum-verified, cached outside the repository, and removed from the build directory afterward. Poppler's `pdftotext` can reorder characters and punctuation inside right-to-left spans, including words with ZWNJ; exact authored Persian words are checked in the fixture source, while rendered Persian layout should be visually inspected. Generated PDFs are removed after the run. GitHub Actions runs the same command on both supported compiler versions.
 
+The focused package test also runs on its own:
+
+```sh
+./tests/test-package.sh
+```
+
+It uses a `typst` already on `PATH` when that version is at least the manifest's `package.compiler` (0.15.0). If the local compiler is older, the test downloads the checksum-pinned 0.15.0 release into `${XDG_CACHE_HOME:-~/.cache}/dorost/typst/` without installing anything system-wide. Set `TYPST_BIN` to select an installed binary, or `DOROST_TYPST_VERSION=0.15.1` to download the other CI version.
+
 ## License
 
 Package code is MIT licensed. The copied starter in `template/` is MIT-0. Tests fetch font fixtures from upstream releases under the SIL Open Font License 1.1; no font binaries are stored in this repository or included in the package. The package manifest's SPDX expression is `MIT AND MIT-0`. See [LICENSE](LICENSE), [LICENSE-MIT-0](LICENSE-MIT-0), and the upstream font releases linked in [tests/fonts/README.md](tests/fonts/README.md).
